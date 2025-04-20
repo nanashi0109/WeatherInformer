@@ -1,6 +1,8 @@
 ﻿using Weather;
+using WeatherInformer.GUI; 
 using System;
 using System.Windows.Forms;
+using WeatherInformer.WidgetFactory;
 
 namespace WeatherInformer
 {
@@ -9,13 +11,9 @@ namespace WeatherInformer
         [STAThread]
         static void Main()
         {
-            //var weatherData = new WeatherData();
-
-            //weatherData.UpdateData();
-
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            Application.Run(new CitiesMenu(new LightWidgetFactory()));
         }
     }
 }
