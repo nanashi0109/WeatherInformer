@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 using Tools;
+using Weather;
 using WeatherInformer.WidgetFactory;
 using WeatherInformerGUI;
 
@@ -10,25 +11,22 @@ namespace WeatherInformer.GUI
     public partial class CitiesMenu : Form
     {
         private IWidgetFactory _widgetFactory;
-        private UIThemeSwitcher _themeSwitcher;
+        private IWeatherData _weatherData;
 
-        public CitiesMenu(IWidgetFactory widgetFactory)
+        private ThemeSwitcher _themeSwitcher;
+
+        public CitiesMenu(IWidgetFactory widgetFactory, IWeatherData weatherData)
         {
-            _themeSwitcher = new UIThemeSwitcher(widgetFactory);
             _widgetFactory = widgetFactory;
 
+            _themeSwitcher = new ThemeSwitcher(widgetFactory);
+            _weatherData = weatherData;
+            
             InitializeComponent();
-            CreateWidgets();
-        }
 
-        #region Createing widgets
-        private void CreateWidgets()
-        {
             SetDefaultFormSettings();
 
-            CreateHeader();
-
-            CreateThemeToggleButton();
+            CreateWidgets();
         }
 
         private void SetDefaultFormSettings()
@@ -44,24 +42,64 @@ namespace WeatherInformer.GUI
             _themeSwitcher.AddWidget(this);
         }
 
+        #region Creating widgets
+        private void CreateWidgets()
+        {
+            CreateHeader();
+
+            CreateThemeToggleButton();
+
+            CreateButtonForOpenNewWindow();
+            CreateUpdateInfoButton();
+        }
+
         private void CreateHeader()
         {
-            var header = _widgetFactory.CreateLabel(new Size(150, 20), new Point(50, 0));
+            var header = _widgetFactory.CreateLabel(new Size(150, 20), new Point(80, 0));
             header.Text = UIConstants.HEADER;
 
-            _themeSwitcher.AddWidget(header);
-            Controls.Add(header);
+            SubscribeWidget(header);
         }
 
         private void CreateThemeToggleButton()
         {
             var themeToggle = _widgetFactory.CreateButton(new Size(20, 20), new Point(255, 5));
 
-            _themeSwitcher.AddWidget(themeToggle);
             _themeSwitcher.AddThemeSwitcher(themeToggle);
-            Controls.Add(themeToggle);
+            SubscribeWidget(themeToggle);
+        }
+
+        private void CreateButtonForOpenNewWindow()
+        {
+            var button = _widgetFactory.CreateButton(new Size(100, 50), new Point(100, 50));
+            button.Text = UIConstants.OPEN_WINDOW;
+
+            button.Click += (object sender, EventArgs e) => OpenNewWeatherMenu();
+
+            SubscribeWidget(button);
+        }
+
+        private void CreateUpdateInfoButton()
+        {
+            var button = _widgetFactory.CreateButton(new Size(100, 25), new Point(100, 105));
+            button.Text = UIConstants.UPDATE_INFO;
+
+            button.Click += (object sender, EventArgs e) => _weatherData.UpdateData();
+            SubscribeWidget(button);
+        }
+
+        private void SubscribeWidget(Control widget)
+        {
+            _themeSwitcher.AddWidget(widget);
+            Controls.Add(widget);
         }
         #endregion
+
+        private void OpenNewWeatherMenu()
+        {
+            var weatherMenu = new WeatherMenu(_themeSwitcher, _weatherData);
+            weatherMenu.Show();
+        }
 
         private void WeatherInformerMenu_Load(object sender, EventArgs e)
         {

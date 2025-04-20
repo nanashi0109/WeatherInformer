@@ -13,7 +13,11 @@ namespace WeatherInformer
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new CitiesMenu(new LightWidgetFactory()));
+
+            var baseWidgetFactory = new LightWidgetFactory();
+            var weatherData = new WeatherData();
+
+            Application.Run(new CitiesMenu(baseWidgetFactory, weatherData));
         }
     }
 }

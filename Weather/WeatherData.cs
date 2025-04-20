@@ -16,6 +16,7 @@ namespace Weather
         public WeatherData()
         {
             _subscribers = new List<IWeatherSubscriber>();
+            UpdateData();
         }
 
         #region Publisher methods
@@ -28,6 +29,7 @@ namespace Weather
             }
 
             _subscribers.Add(subscriber);
+            subscriber.Update(GetMessage());
         }
 
         public void RemoveListener(IWeatherSubscriber subscriber)
@@ -43,11 +45,14 @@ namespace Weather
 
         public void Notify()
         {
-            WeatherMessage message = new WeatherMessage(_weatherInfo);
+            WeatherMessage message = GetMessage();
 
             foreach (var subscriber in _subscribers)
                 subscriber.Update(message);
         }
+
+        private WeatherMessage GetMessage() 
+            => new WeatherMessage(_weatherInfo);
         #endregion
 
         public async void UpdateData()
@@ -75,13 +80,11 @@ namespace Weather
 
         private async Task<string> GetResponse(HttpClient client)
         {
-            string url = $"{Constants.SITE_URL}/data/2.5/weather?q=Moscow&appid={Constants.API_KEY}&units=metric";
+            string url = $"{Constants.SITE_URL}/data/2.5/weather?q=Moscow&appid={Secret.API_KEY}&units=metric";
             HttpResponseMessage response = await client.GetAsync(url);
 
             if (!response.IsSuccessStatusCode)
-            {
                 Console.WriteLine($"Error: {response.StatusCode}");
-            }
 
             return await response.Content.ReadAsStringAsync();
         }

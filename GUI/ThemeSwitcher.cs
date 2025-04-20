@@ -5,14 +5,16 @@ using WeatherInformer.WidgetFactory;
 
 namespace WeatherInformerGUI
 {
-    public class UIThemeSwitcher
+    public class ThemeSwitcher
     {
+        public IWidgetFactory GetFactory => _widgetFactory;
+
         private List<Button> _themeSwitchers;
         private List<Control> _widgets;
 
         private IWidgetFactory _widgetFactory;
 
-        public UIThemeSwitcher(IWidgetFactory widgetFactory)
+        public ThemeSwitcher(IWidgetFactory widgetFactory)
         {
             _widgetFactory = widgetFactory;
             _widgets = new List<Control>();
